@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html ng-app="morningStar">
+	<head>
+		<title>Morning Star Assignment</title>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular.min.js" type="text/javaScript"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javaScript"></script>
+		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js" type="text/javaScript"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" />
+		<script type="text/javaScript">
+			var myApp = angular.module("morningStar",[]);
+			myApp.controller("portfolioController",function($scope,$http){
+				$scope.dataValid = true;
+				$scope.isResponse = false;
+				$scope.fetchPortfolio = function(isDataValid){
+					$scope.portfolioDate = jQuery("#portfolioDate").val();
+					if(isDataValid === true){
+						$scope.dataValid = true;
+						console.log("VALID data entered");
+						
+						$http.post("http://192.168.56.102:8045",{
+							portfolioNum : $scope.portfolioNumber,
+							portfolioDate : $scope.portfolioDate
+						}).success(function(response){
+							$scope.isResponse = true;
+							$scope.portfolioA = (response.A).toFixed(2);
+							$scope.portfolioB = (response.B).toFixed(2);
+							$scope.portfolioC = (response.C).toFixed(2);
+							$scope.portfolioTotal = response.total;
+							console.log(" Success  "+response.total);
+								
+						});
+					}else{
+						$scope.dataValid = false;
+					}
+				}	
+			});
+			jQuery(document).ready(function(){
+				jQuery("#portfolioDate").datepicker({
+            				constrainInput: true,
+            				showOn: 'button',
+            				buttonText: 'Select...',
+					dateFormat: "yy-mm-dd",
+					changeYear: "true"
+        			});	
+			});
+		</script>
+		<style type="text/css">
+			
+			#defaultValidationClassesPart .ng-invalid{
+				border: solid red 3px;
+			}
+			#customValidationClassesPart .invalidItem{
+				border: dashed red 2px;
+			}
+			.invalidClass{
+				border: solid red 3px;
+			}
+			.invalidMsg{
+				color:red;
+				font-weight : bold;
+			}
+		</style>
+	</head>
+	<body ng-controller="portfolioController">
+		<div class="container">
+			<div class="page-header">
+				<h1>My MorningStar Assignment</h1>
+			</div>
+			<div class="row">
+				<div class="col-md-8 col-md-offset-4">
+					<div ng-show="!dataValid" class="alert alert-danger" role="alert">
+						<p	ng-if="portfolioForm.portfolioNumber.$error.required"
+							class="invalidMsg">Portfolio Number can't be empty</p>
+						<p 	ng-if="portfolioForm.portfolioNumber.$error.pattern" 
+							class="invalidMsg">Portfolio Number should be greater than zero and non decimal</p>
+						<p 	ng-if="portfolioForm.portfolioDate.$error.required" 
+							class="invalidMsg">Portfolio Date can't be empty</p>
+					</div>
+					<form class="form-horizontal" name="portfolioForm" ng-submit="fetchPortfolio(portfolioForm.$valid)" novalidate>
+						<div class="form-group">
+							<label 	for="portfolioNumber" 
+								class="col-md-3 control-label">Portfolio No <span style="color:red">*</span>
+							</label>
+							<div class="col-md-5">
+								<input	type="text"
+									id="portfolioNumber" 
+									ng-model="portfolioNumber"
+									name="portfolioNumber" 
+									ng-pattern="/^[0-9]*$/"
+									required />
+								<p 	ng-show="portfolioForm.portfolioNumber.$dirty"
+									ng-if="portfolioForm.portfolioNumber.$error.required" 
+									class="invalidMsg">Portfolio Number can't be empty</p>
+								<p 	ng-if="portfolioForm.portfolioNumber.$error.pattern" 
+									class="invalidMsg">Portfolio Number should be greater than zero and non decimal</p>
+							</div>
+						</div>
+						<div class="form-group">
+							<label 	for="portfolioDate" 
+								class="col-md-3 control-label">Portfolio Date <span style="color:red">*</span>
+							</label>
+							<div class="col-md-5">
+								<input	type="text"
+									id="portfolioDate" 
+									ng-model="portfolioDate"
+									name="portfolioDate" 
+									required />
+								<p 	ng-show="portfolioForm.portfolioDate.$dirty"
+									ng-if="portfolioForm.portfolioDate.$error.required" 
+									class="invalidMsg">Portfolio Date can't be empty</p>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-md-3 col-md-offset-5">
+								<button type="submit" class="btn btn-default">Submit</button>
+							</div>
+						</div>	
+					</form>	
+				</div>
+			</div><!-- row  -->
+			<div class="row" ng-show="isResponse">
+ 				<div class="col-md-8 col-md-offset-4">
+					<h3>Portfolio A <span class="label label-default">{{portfolioA}}</span></h3>
+					<h3>Portfolio B <span class="label label-default">{{portfolioB}}</span></h3>
+					<h3>Portfolio C <span class="label label-default">{{portfolioC}}</span></h3>
+					<h3>Total <span class="label label-default">{{portfolioTotal}}</span></h3>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,4 @@
+{
+	"name" : "myDummyModule",
+	"main" : "../folder01/myScript.js"
+}
